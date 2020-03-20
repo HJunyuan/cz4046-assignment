@@ -31,8 +31,21 @@ public class Cell {
 		return policy;
 	}
 
-	public void setPolicy(Policy policy) {
-		this.policy = policy;
+	public void setPolicy(int val) {
+		switch (val) {
+		case Coordinate.UP:
+			this.policy = Policy.UP;
+			break;
+		case Coordinate.DOWN:
+			this.policy = Policy.DOWN;
+			break;
+		case Coordinate.LEFT:
+			this.policy = Policy.LEFT;
+			break;
+		case Coordinate.RIGHT:
+			this.policy = Policy.RIGHT;
+			break;
+		}
 	}
 
 	public Coordinate getCoordinate() {
@@ -51,8 +64,21 @@ public class Cell {
 		return cellType;
 	}
 
-	public void setCellType(CellType cellType) {
-		this.cellType = cellType;
+	public void setCellType(char type) {
+		switch(type) {
+		case 'W':
+			this.cellType = CellType.WHITE;
+			break;
+		case 'G':
+			this.cellType = CellType.GREEN;
+			break;
+		case 'B':
+			this.cellType = CellType.BROWN;
+			break;
+		case 'X':
+			this.cellType = CellType.WALL;
+			break;
+		}
 	}
 
 }
