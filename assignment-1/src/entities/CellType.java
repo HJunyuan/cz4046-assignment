@@ -17,4 +17,19 @@ public enum CellType {
 			return 0f;
 		}
 	}
+
+	public String getSymbol() {
+		switch (this) {
+		case WHITE:
+			return "W";
+		case GREEN:
+			return "G";
+		case BROWN:
+			return "B";
+		case WALL:
+			return "X";
+		default:
+			return "";
+		}
+	}
 }
