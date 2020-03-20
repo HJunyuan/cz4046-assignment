@@ -2,6 +2,8 @@ package entities;
 
 public class Coordinate {
 	private int col, row;
+	public static final int DIRECTIONS = 4;
+	public static final int UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3;
 
 	/**
 	 * As specified in the assignment, coordinates are in (col,row) format with the
@@ -31,39 +33,50 @@ public class Coordinate {
 		return this.row;
 	}
 
-	public Coordinate getUp() {
-		try {
-			Coordinate down = new Coordinate(this.col, this.row + 1);
-			return down;
-		} catch (IllegalArgumentException e) {
-			return this;
-		}
-	}
+	/**
+	 * Get new coordinates by moving to the intending position.
+	 * 
+	 * @return [Intended Position, Right Angle (L), Right Angle (R)]
+	 */
+	public Coordinate[] coordsMovingTo(int direction) {
+		Coordinate[] coordinates = new Coordinate[3];
 
-	public Coordinate getDown() {
-		try {
-			Coordinate down = new Coordinate(this.col, this.row - 1);
-			return down;
-		} catch (IllegalArgumentException e) {
-			return this;
-		}
-	}
+		// @formatter:off
+		/*
+		 * Offset Rule
+		 * 
+		 * Shape: 4 x 3 x 2
+		 * 
+		 * 4x: [UP, DOWN, LEFT, RIGHT] 3x: [Intended Position, Right Angle (L), Right
+		 * Angle (R)] 2x: [col, row]
+		 * 
+		 */
+		// @formatter:on
 
-	public Coordinate getLeft() {
-		try {
-			Coordinate down = new Coordinate(this.col - 1, this.row);
-			return down;
-		} catch (IllegalArgumentException e) {
-			return this;
-		}
-	}
+		int[][][] offset = { { { 0, -1 }, { -1, 0 }, { +1, 0 } }, { { 0, +1 }, { +1, 0 }, { -1, 0 } },
+				{ { -1, 0 }, { 0, +1 }, { 0, -1 } }, { { +1, 0 }, { 0, -1 }, { 0, +1 } } };
 
-	public Coordinate getRight() {
+		/* Forward */
 		try {
-			Coordinate down = new Coordinate(this.col + 1, this.row);
-			return down;
+			coordinates[0] = new Coordinate(this.col + offset[direction][0][0], this.row + offset[direction][0][1]);
 		} catch (IllegalArgumentException e) {
-			return this;
+			coordinates[0] = this;
 		}
+
+		/* Left */
+		try {
+			coordinates[1] = new Coordinate(this.col + offset[direction][1][0], this.row + offset[direction][1][1]);
+		} catch (IllegalArgumentException e) {
+			coordinates[1] = this;
+		}
+
+		/* Right */
+		try {
+			coordinates[2] = new Coordinate(this.col + offset[direction][2][0], this.row + offset[direction][2][1]);
+		} catch (IllegalArgumentException e) {
+			coordinates[2] = this;
+		}
+
+		return coordinates;
 	}
 }
