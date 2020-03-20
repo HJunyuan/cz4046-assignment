@@ -1,5 +1,10 @@
 package entities;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.Scanner;
+
 public class Grid {
 	Cell[][] cells;
 	int numCol, numRow;
@@ -11,12 +16,13 @@ public class Grid {
 	 * @param col
 	 * @param row
 	 */
-	public Grid(int numCol, int numRow) {
+	public Grid() {
 		if (numCol < 0 || numRow < 0)
 			throw new IllegalArgumentException("Col and Row must be a positive integer.");
 
-		this.numCol = numCol;
-		this.numRow = numRow;
+		this.numCol = Constants.NUM_COL;
+		this.numRow = Constants.NUM_ROW;
+		this.cells = new Cell[this.numCol][this.numRow];
 
 		for (int c = 0; c < numCol; c++) {
 			for (int r = 0; r < numRow; r++) {
@@ -26,66 +32,65 @@ public class Grid {
 		}
 	}
 
+	public Grid(String fileName) {
+		this();
+		this.importMapFromFile(fileName);
+	}
+
 	public Cell getCell(Coordinate coordinate) {
 		int c = coordinate.getCol();
 		int r = coordinate.getRow();
-		
-		this.isInvalidColRow(c, r);
-		
+
 		return cells[c][r];
 	}
 
 	public void setCell(Coordinate coordinate, Cell cell) {
 		int c = coordinate.getCol();
 		int r = coordinate.getRow();
-		
-		this.isInvalidColRow(c, r);
-		
+
 		cells[c][r] = cell;
 	}
 
 	/**
-	 * Get number of Col and Row.
-	 * 
-	 * @return 0: col, 1: row
+	 * Prints Grid in the console
 	 */
-	public int[] getNumOfColRow() {
-		int[] colRow = { this.numCol, this.numRow };
-		return colRow;
+	public void print() {
+		for (int r = 0; r < this.numRow; r++) {
+			for (int c = 0; c < this.numCol; c++) {
+				Cell currCell = cells[c][r];
+
+				if (currCell.getCellType() != CellType.WALL) {
+					double utility = currCell.getUtility();
+					String cellType = currCell.getCellType().getSymbol();
+					String policy = currCell.getPolicy().getSymbol();
+					
+					System.out.printf("| " + cellType + " %7.3f " + policy, utility);
+				} else {
+					System.out.print("|            ");
+				}
+			}
+			System.out.println("|");
+		}
+		System.out.println();
 	}
 
-	/**
-	 * Checks if specified col or row is within range.
-	 * 
-	 * @param col
-	 * @param row
-	 * @return
-	 */
-	public void isInvalidColRow(int col, int row) {
-		if (col < 0 || col > this.numCol - 1)
-			throw new IllegalArgumentException("Col or Row specified is out of range.");
-		else if (row < 0 || row > this.numRow - 1)
-			throw new IllegalArgumentException("Col or Row specified is out of range.");
-	}
+	public void importMapFromFile(String fileName) {
+		try {
+			String filePath = new File("").getAbsolutePath();
+			Scanner s = new Scanner(new BufferedReader(new FileReader(filePath.concat("/presets/" + fileName))));
 
-	public Cell[] getNeighbours(Coordinate coordinate) {
-		int c = coordinate.getCol();
-		int r = coordinate.getRow();
-		
-		this.isInvalidColRow(c, r);
-		
-		// Top
-		
-		// Right
-		
-		// Left
-		
-		// Bottom
-		
-		return null;
-	}
+			while (s.hasNext()) {
+				for (int r = 0; r < this.numRow; r++) {
+					for (int c = 0; c < this.numCol; c++) {
+						char type = s.next().charAt(0);
+						cells[c][r].setCellType(type);
+					}
+				}
+			}
 
-	public void calculateUtility(int col, int row) {
-
+			s.close();
+		} catch (Exception e) {
+			System.out.println(e);
+		}
 	}
 }
