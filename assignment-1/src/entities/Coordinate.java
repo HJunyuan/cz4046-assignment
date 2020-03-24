@@ -2,12 +2,12 @@ package entities;
 
 public class Coordinate {
 	private int col, row;
-	public static final int DIRECTIONS = 4;
+	public static final int TOTAL_DIRECTIONS = 4;
 	public static final int UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3;
 
 	/**
-	 * As specified in the assignment, coordinates are in (col,row) format with the
-	 * top left corner being (0,0).
+	 * As specified in the assignment, coordinates are in (col,row) format with the top left corner
+	 * being (0,0).
 	 * 
 	 * @param col
 	 * @param row
@@ -34,11 +34,11 @@ public class Coordinate {
 	}
 
 	/**
-	 * Get new coordinates by moving to the intending position.
+	 * Get the next 3 possible coordinates with respect to provided direction.
 	 * 
 	 * @return [Intended Position, Right Angle (L), Right Angle (R)]
 	 */
-	public Coordinate[] coordsMovingTo(int direction) {
+	public Coordinate[] getNeighbours(int direction) {
 		Coordinate[] coordinates = new Coordinate[3];
 
 		// @formatter:off
@@ -47,8 +47,9 @@ public class Coordinate {
 		 * 
 		 * Shape: 4 x 3 x 2
 		 * 
-		 * 4x: [UP, DOWN, LEFT, RIGHT] 3x: [Intended Position, Right Angle (L), Right
-		 * Angle (R)] 2x: [col, row]
+		 * 4x: [UP, DOWN, LEFT, RIGHT]
+		 * 3x: [UP (Forward), Right Angle (L), Right Angle (R)]
+		 * 2x: [col, row]
 		 * 
 		 */
 		// @formatter:on
@@ -56,7 +57,7 @@ public class Coordinate {
 		int[][][] offset = { { { 0, -1 }, { -1, 0 }, { +1, 0 } }, { { 0, +1 }, { +1, 0 }, { -1, 0 } },
 				{ { -1, 0 }, { 0, +1 }, { 0, -1 } }, { { +1, 0 }, { 0, -1 }, { 0, +1 } } };
 
-		/* Forward */
+		/* Up */
 		try {
 			coordinates[0] = new Coordinate(this.col + offset[direction][0][0], this.row + offset[direction][0][1]);
 		} catch (IllegalArgumentException e) {
