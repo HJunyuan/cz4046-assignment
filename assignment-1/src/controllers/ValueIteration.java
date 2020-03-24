@@ -1,6 +1,7 @@
 package controllers;
 
 import entities.Cell;
+import entities.CellType;
 import entities.Constants;
 import entities.Coordinate;
 import entities.Grid;
@@ -15,61 +16,101 @@ public class ValueIteration {
 		System.out.println("Original:");
 		grid.print();
 
-		for (int i = 1; i <= NUM_ITERATIONS; i++) {
-			System.out.printf("ITERATION %d:\n", i);
-			runValueIteration(grid);
-			grid.print();
-		}
+		runValueIteration(grid);
 	}
 
 	private static void runValueIteration(Grid grid) {
-		for (int c = 0; c < Constants.NUM_COL; c++) {
-			for (int r = 0; r < Constants.NUM_ROW; r++) {
-				calculateUtility(new Coordinate(c, r), grid);
+		double threshold = Constants.EPSILON * ((1 - Constants.DISCOUNT_FACTOR) / Constants.DISCOUNT_FACTOR);
+		int i = 1;
+		double maxChangeInUtility = 0;
+
+		do {
+			System.out.printf("Iteration: %d\n", i);
+			maxChangeInUtility = 0;
+
+			/* Runs 1 iteration */
+			for (int c = 0; c < Constants.NUM_COL; c++) {
+				for (int r = 0; r < Constants.NUM_ROW; r++) {
+					Cell currCell = grid.getCell(new Coordinate(c, r));
+
+					/* Skip if currCell is a wall */
+					if (currCell.getCellType() == CellType.WALL)
+						continue;
+
+					/* Find maximum change in utility */
+					double changeInUtility = calculateUtility(currCell, grid);
+					if (changeInUtility > maxChangeInUtility)
+						maxChangeInUtility = changeInUtility;
+				}
 			}
-		}
+
+			i++;
+			System.out.printf("Maximum change in utility: %5.3f\n", maxChangeInUtility);
+			grid.print();
+		} while (maxChangeInUtility > threshold);
 	}
 
-	private static void calculateUtility(Coordinate coord, Grid grid) {
-		double[] utilities = new double[Coordinate.DIRECTIONS];
-		int maxU = 0;
+	/**
+	 * Calculate the utility of the given <i>Cell</i>.
+	 * 
+	 * @param currCell
+	 * @param grid
+	 * @return The difference prevUtility and newUtility
+	 */
+	private static double calculateUtility(Cell currCell, Grid grid) {
+		Coordinate currCoord = currCell.getCoordinate();
+		double[] possible_utilities = new double[Coordinate.TOTAL_DIRECTIONS];
 
-		/* Get all possible utilities (i.e. 4 possible directions) */
-		for (int dir = 0; dir < utilities.length; dir++) {
-			Coordinate[] posCoords = coord.coordsMovingTo(dir);
-//			System.out.printf("At: %d, %d Dir: %d\n", coord.getCol(), coord.getRow(), dir);
+		/* 1. Find all possible utilities (i.e. 4 possible directions) */
+		for (int dir = 0; dir < Coordinate.TOTAL_DIRECTIONS; dir++) {
+			Coordinate[] neighbours = currCoord.getNeighbours(dir);
 
-			for (int pos = 0; pos < posCoords.length; pos++) {
-//				System.out.printf(grid.getCell(posCoords[pos]).getCellType().getSymbol() + " %d, %d\n",
-//						posCoords[pos].getCol(), posCoords[pos].getRow());
-				float probability = 0f;
+			/* 1a. Sum up the 3 neighbours (i.e. UP, LEFT, RIGHT) */
+			for (int n = 0; n < neighbours.length; n++) {
+				float probability = 0;
+				double utility = 0;
 
-				switch (pos) {
+				switch (n) {
+				// Up
 				case 0:
 					probability = Constants.PROBABILITY_UP;
 					break;
+				// Left
 				case 1:
 					probability = Constants.PROBABILITY_LEFT;
 					break;
+				// Right
 				case 2:
 					probability = Constants.PROBABILITY_RIGHT;
 					break;
 				}
 
-				utilities[dir] += probability * grid.getCell(posCoords[pos]).getUtility();
+				/* 1b. Make sure neighbour CellType is not a wall */
+				Cell neighbourCell = grid.getCell(neighbours[n]);
+				if (neighbourCell.getCellType() != CellType.WALL)
+					utility = neighbourCell.getUtility();
+				else	// If wall, just use currCell utility
+					utility = currCell.getUtility();
+
+				possible_utilities[dir] += probability * utility;
 			}
 		}
 
-		/* Find best action with highest utility */
-		for (int u = 1; u < utilities.length; u++) {
-			if (utilities[u] > utilities[maxU])
+		/* 2. Find the maximum possible utility */
+		int maxU = 0;
+		for (int u = 1; u < possible_utilities.length; u++) {
+			if (possible_utilities[u] > possible_utilities[maxU])
 				maxU = u;
 		}
 
-		/* Set utility & policy */
-		Cell currCell = grid.getCell(coord);
-		currCell.setUtility(currCell.getCellType().getReward() + Constants.DISCOUNT_FACTOR * utilities[maxU]);
+		/* 3. Set utility & policy of current cell */
+		float currReward = currCell.getCellType().getReward();
+		double prevUtility = currCell.getUtility();
+		double newUtility = currReward + Constants.DISCOUNT_FACTOR * possible_utilities[maxU];
+		currCell.setUtility(newUtility);
 		currCell.setPolicy(maxU);
-	}
 
+		/* 4. Return the difference of prevUtility & newUtility */
+		return (Math.abs(prevUtility - newUtility));
+	}
 }
