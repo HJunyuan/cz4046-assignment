@@ -18,4 +18,7 @@ public class Constants {
 	
 	/* Discount Factor */
 	public final static float DISCOUNT_FACTOR = 0.99f;
+	
+	/* Epsilon */
+	public final static int EPSILON = 62;
 }
