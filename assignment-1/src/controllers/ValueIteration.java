@@ -56,55 +56,30 @@ public class ValueIteration {
 	 * @return The difference prevUtility and newUtility
 	 */
 	private static double calculateUtility(Cell currCell, Grid grid) {
-		Coordinate currCoord = currCell.getCoordinate();
-		double[] possible_utilities = new double[Coordinate.TOTAL_DIRECTIONS];
+		double[] subUtilities = new double[Coordinate.TOTAL_DIRECTIONS];
 
 		/* 1. Find all possible utilities (i.e. 4 possible directions) */
 		for (int dir = 0; dir < Coordinate.TOTAL_DIRECTIONS; dir++) {
-			Coordinate[] neighbours = currCoord.getNeighbours(dir);
-
 			/* 1a. Sum up the 3 neighbours (i.e. UP, LEFT, RIGHT) */
-			for (int n = 0; n < neighbours.length; n++) {
-				float probability = 0;
-				double utility = 0;
+			Cell[] neighbours = grid.getNeighboursOfCell(currCell, dir);
+			double up = Constants.PROBABILITY_UP * neighbours[0].getUtility();
+			double left = Constants.PROBABILITY_LEFT * neighbours[1].getUtility();
+			double right = Constants.PROBABILITY_RIGHT * neighbours[2].getUtility();
 
-				switch (n) {
-				// Up
-				case 0:
-					probability = Constants.PROBABILITY_UP;
-					break;
-				// Left
-				case 1:
-					probability = Constants.PROBABILITY_LEFT;
-					break;
-				// Right
-				case 2:
-					probability = Constants.PROBABILITY_RIGHT;
-					break;
-				}
-
-				/* 1b. Make sure neighbour CellType is not a wall */
-				Cell neighbourCell = grid.getCell(neighbours[n]);
-				if (neighbourCell.getCellType() != CellType.WALL)
-					utility = neighbourCell.getUtility();
-				else	// If wall, just use currCell utility
-					utility = currCell.getUtility();
-
-				possible_utilities[dir] += probability * utility;
-			}
+			subUtilities[dir] = up + left + right;
 		}
 
 		/* 2. Find the maximum possible utility */
 		int maxU = 0;
-		for (int u = 1; u < possible_utilities.length; u++) {
-			if (possible_utilities[u] > possible_utilities[maxU])
+		for (int u = 1; u < subUtilities.length; u++) {
+			if (subUtilities[u] > subUtilities[maxU])
 				maxU = u;
 		}
 
 		/* 3. Set utility & policy of current cell */
 		float currReward = currCell.getCellType().getReward();
 		double prevUtility = currCell.getUtility();
-		double newUtility = currReward + Constants.DISCOUNT_FACTOR * possible_utilities[maxU];
+		double newUtility = currReward + Constants.DISCOUNT_FACTOR * subUtilities[maxU];
 		currCell.setUtility(newUtility);
 		currCell.setPolicy(maxU);
 
