@@ -1,15 +1,35 @@
 package entities;
 
 public enum Policy {
-	UP("\u2191"), DOWN("\u2193"), LEFT("\u2190"), RIGHT("\u2192");
+	UP(0), DOWN(1), LEFT(2), RIGHT(3);
 
-	private String arrow;
+	private int direction; // UP = 0, DOWN = 1, LEFT = 2, RIGHT = 3
+	private String symbol;
 
-	private Policy(String arrow) {
-		this.arrow = arrow;
+	private Policy(int direction) {
+		this.direction = direction;
+
+		switch (direction) {
+		case 0:
+			this.symbol = "\u2191";
+			break;
+		case 1:
+			this.symbol = "\u2193";
+			break;
+		case 2:
+			this.symbol = "\u2190";
+			break;
+		case 3:
+			this.symbol = "\u2192";
+			break;
+		}
 	}
 
 	public String getSymbol() {
-		return this.arrow;
+		return this.symbol;
+	}
+	
+	public int getDirection() {
+		return this.direction;
 	}
 }
