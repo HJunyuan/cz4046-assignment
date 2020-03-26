@@ -8,8 +8,6 @@ import entities.Grid;
 
 public class ValueIteration {
 
-	private static final int NUM_ITERATIONS = 50;
-
 	public static void main(String[] args) {
 		Grid grid = new Grid("preset-1.txt");
 
