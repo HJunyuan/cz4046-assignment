@@ -69,7 +69,7 @@ public class Grid {
 
 			/* If it's a wall, use current coordinate */
 			if (neighbourCell.getCellType() == CellType.WALL)
-				neighbourCoords[n] = (Coordinate) currCell;
+				neighbourCoords[n] = (Coordinate) currCell; // Upcasting explicitly (not compulsory)
 
 			neighbourCells[n] = this.getCell(neighbourCoords[n]);
 		}
@@ -94,7 +94,7 @@ public class Grid {
 
 			/* If it's a wall, use current coordinate */
 			if (neighbourCell.getCellType() == CellType.WALL)
-				neighbourCoords[n] = (Coordinate) currCell;
+				neighbourCoords[n] = (Coordinate) currCell; // Upcasting explicitly (not compulsory)
 
 			neighbourCells[n] = this.getCell(neighbourCoords[n]);
 		}
