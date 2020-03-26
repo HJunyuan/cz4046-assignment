@@ -7,7 +7,6 @@ import java.util.List;
 
 public class CSV {
 	public static void writeToFile(String fileName, List<String> headers, List<List<Double>> data) {
-		File file;
 		FileWriter csvWriter;
 		try {
 			String filePath = new File("").getAbsolutePath();
