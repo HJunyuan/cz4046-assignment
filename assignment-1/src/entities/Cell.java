@@ -1,9 +1,8 @@
 package entities;
 
-public class Cell {
+public class Cell extends Coordinate {
 	private double utility;
 	private Policy policy;
-	private Coordinate coordinate;
 	private CellType cellType;
 
 	/**
@@ -13,7 +12,7 @@ public class Cell {
 	 * @param coordinate
 	 */
 	public Cell(Coordinate coordinate) {
-		this.coordinate = coordinate;
+		super(coordinate.getCol(), coordinate.getRow());
 		this.utility = 0;
 		this.policy = Policy.UP;
 		this.cellType = CellType.WHITE;
@@ -48,24 +47,12 @@ public class Cell {
 		}
 	}
 
-	public Coordinate getCoordinate() {
-		return coordinate;
-	};
-
-	public int getCol() {
-		return coordinate.getCol();
-	}
-
-	public int getRow() {
-		return coordinate.getRow();
-	}
-
 	public CellType getCellType() {
 		return cellType;
 	}
 
 	public void setCellType(char type) {
-		switch(type) {
+		switch (type) {
 		case 'W':
 			this.cellType = CellType.WHITE;
 			break;

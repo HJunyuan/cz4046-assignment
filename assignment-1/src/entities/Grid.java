@@ -59,9 +59,8 @@ public class Grid {
 	 * @return [Intended Position, Right Angle (L), Right Angle (R)]
 	 */
 	public Cell[] getNeighboursOfCell(Cell currCell) {
-		Coordinate currCoord = currCell.getCoordinate();
 		Policy currPolicy = currCell.getPolicy();
-		Coordinate[] neighbourCoords = currCoord.getNeighbours(currPolicy.getDirection());
+		Coordinate[] neighbourCoords = currCell.getNeighbours(currPolicy.getDirection());
 
 		/* Make sure neighbour CellType is not a wall */
 		Cell[] neighbourCells = new Cell[neighbourCoords.length];
@@ -70,7 +69,7 @@ public class Grid {
 
 			/* If it's a wall, use current coordinate */
 			if (neighbourCell.getCellType() == CellType.WALL)
-				neighbourCoords[n] = currCell.getCoordinate();
+				neighbourCoords[n] = (Coordinate) currCell;
 
 			neighbourCells[n] = this.getCell(neighbourCoords[n]);
 		}
@@ -86,8 +85,7 @@ public class Grid {
 	 * @return [Intended Position, Right Angle (L), Right Angle (R)]
 	 */
 	public Cell[] getNeighboursOfCell(Cell currCell, int direction) {
-		Coordinate currCoord = currCell.getCoordinate();
-		Coordinate[] neighbourCoords = currCoord.getNeighbours(direction);
+		Coordinate[] neighbourCoords = currCell.getNeighbours(direction);
 
 		/* Make sure neighbour CellType is not a wall */
 		Cell[] neighbourCells = new Cell[neighbourCoords.length];
@@ -96,7 +94,7 @@ public class Grid {
 
 			/* If it's a wall, use current coordinate */
 			if (neighbourCell.getCellType() == CellType.WALL)
-				neighbourCoords[n] = currCell.getCoordinate();
+				neighbourCoords[n] = (Coordinate) currCell;
 
 			neighbourCells[n] = this.getCell(neighbourCoords[n]);
 		}
