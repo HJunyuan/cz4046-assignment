@@ -5,6 +5,7 @@ import entities.CellType;
 import entities.Constants;
 import entities.Coordinate;
 import entities.Grid;
+import logger.LogBuilder;
 
 public class ValueIteration {
 
@@ -19,11 +20,12 @@ public class ValueIteration {
 
 	private static void runValueIteration(Grid grid) {
 		double threshold = Constants.EPSILON * ((1 - Constants.DISCOUNT_FACTOR) / Constants.DISCOUNT_FACTOR);
-		int i = 1;
 		double maxChangeInUtility = 0;
+		int iteration = 1;
+		LogBuilder logger = new LogBuilder("ValueIteration");
 
 		do {
-			System.out.printf("Iteration: %d\n", i);
+			System.out.printf("Iteration: %d\n", iteration);
 			maxChangeInUtility = 0;
 
 			/* Runs 1 iteration */
@@ -42,10 +44,13 @@ public class ValueIteration {
 				}
 			}
 
-			i++;
+			iteration++;
 			System.out.printf("Maximum change in utility: %5.3f\n", maxChangeInUtility);
 			grid.print();
-		} while (maxChangeInUtility > threshold);
+			logger.add(grid);
+		} while (iteration <= 100); // maxChangeInUtility > threshold
+
+		logger.finalise();
 	}
 
 	/**
