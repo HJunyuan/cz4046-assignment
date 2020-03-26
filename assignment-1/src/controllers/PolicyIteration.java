@@ -4,7 +4,6 @@ import entities.Cell;
 import entities.Constants;
 import entities.Coordinate;
 import entities.Grid;
-import entities.Policy;
 
 public class PolicyIteration {
 
@@ -18,7 +17,31 @@ public class PolicyIteration {
 	}
 
 	private static void runPolicyIteration(Grid grid) {
+		boolean didChange;
+		int iteration = 1;
 
+		do {
+			System.out.printf("Iteration %d:\n", iteration);
+			didChange = false;
+
+			/* 1. Policy Evaluation */
+			policyEvaluation(grid, 10);
+
+			/* 2. Policy Improvement */
+			for (int c = 0; c < Constants.NUM_COL; c++) {
+				for (int r = 0; r < Constants.NUM_ROW; r++) {
+					Cell currCell = grid.getCell(new Coordinate(c, r));
+
+					boolean changed = policyImprovement(currCell, grid);
+
+					if (changed)
+						didChange = true;
+				}
+			}
+
+			iteration++;
+			grid.print();
+		} while (didChange);
 	}
 
 	/**
@@ -27,28 +50,67 @@ public class PolicyIteration {
 	 * @param grid
 	 * @return
 	 */
-	private static void policyEvaluation(Grid grid) {
-		for (int c = 0; c < Constants.NUM_COL; c++) {
-			for (int r = 0; r < Constants.NUM_ROW; r++) {
-				/* 1. Get current reward & policy */
-				Cell currCell = grid.getCell(new Coordinate(c, r));
+	private static void policyEvaluation(Grid grid, int k) {
+		for (int i = 0; i < k; i++) {
+			for (int c = 0; c < Constants.NUM_COL; c++) {
+				for (int r = 0; r < Constants.NUM_ROW; r++) {
+					/* 1. Get current reward & policy */
+					Cell currCell = grid.getCell(new Coordinate(c, r));
 
-				/*
-				 * 2. Sum up the 3 neighbours (i.e. UP, LEFT, RIGHT) based on the current policy
-				 */
-				Cell[] neighbours = grid.getNeighboursOfCell(currCell);
-				double up = Constants.PROBABILITY_UP * neighbours[0].getUtility();
-				double left = Constants.PROBABILITY_LEFT * neighbours[1].getUtility();
-				double right = Constants.PROBABILITY_RIGHT * neighbours[2].getUtility();
+					/*
+					 * 2. Sum up the 3 neighbours (i.e. UP, LEFT, RIGHT) based on the current policy
+					 */
+					Cell[] neighbours = grid.getNeighboursOfCell(currCell);
+					double up = Constants.PROBABILITY_UP * neighbours[0].getUtility();
+					double left = Constants.PROBABILITY_LEFT * neighbours[1].getUtility();
+					double right = Constants.PROBABILITY_RIGHT * neighbours[2].getUtility();
 
-				/* 3. Update Utility */
-				float reward = currCell.getCellType().getReward();
-				currCell.setUtility(reward + up + left + right);
+					/* 3. Update Utility */
+					float reward = currCell.getCellType().getReward();
+					currCell.setUtility(reward + Constants.DISCOUNT_FACTOR * (up + left + right));
+				}
 			}
 		}
 	}
 
-	private static void policyImprovement() {
+	/**
+	 * 
+	 * @param currCell
+	 * @param grid
+	 * @return <i>true</i> if policy is changed
+	 */
+	private static boolean policyImprovement(Cell currCell, Grid grid) {
+		/* 1. Find the maximum possible sub-utility */
+		double[] maxSubUtility = new double[Coordinate.TOTAL_DIRECTIONS];
+		for (int dir = 0; dir < Coordinate.TOTAL_DIRECTIONS; dir++) {
+			Cell[] neighbours = grid.getNeighboursOfCell(currCell, dir);
+			double up = Constants.PROBABILITY_UP * neighbours[0].getUtility();
+			double left = Constants.PROBABILITY_LEFT * neighbours[1].getUtility();
+			double right = Constants.PROBABILITY_RIGHT * neighbours[2].getUtility();
 
+			maxSubUtility[dir] = up + left + right;
+		}
+
+		int maxSU = 0;
+		for (int m = 1; m < maxSubUtility.length; m++) {
+			if (maxSubUtility[m] > maxSubUtility[maxSU])
+				maxSU = m;
+		}
+
+		/* 2. Current sub-utility */
+		Cell[] neighbours = grid.getNeighboursOfCell(currCell);
+		double up = Constants.PROBABILITY_UP * neighbours[0].getUtility();
+		double left = Constants.PROBABILITY_LEFT * neighbours[1].getUtility();
+		double right = Constants.PROBABILITY_RIGHT * neighbours[2].getUtility();
+
+		double currSubUtility = up + left + right;
+
+		/* 3. Update policy? */
+		if (maxSubUtility[maxSU] > currSubUtility) {
+			currCell.setPolicy(maxSU);
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
