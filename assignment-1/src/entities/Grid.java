@@ -44,13 +44,6 @@ public class Grid {
 		return cells[c][r];
 	}
 
-	public void setCell(Coordinate coordinate, Cell cell) {
-		int c = coordinate.getCol();
-		int r = coordinate.getRow();
-
-		cells[c][r] = cell;
-	}
-
 	/**
 	 * Get the 3 neighbours (UP, LEFT, RIGHT) with respect to the current Policy.
 	 * Will make sure that returned neighbours are not walls.
