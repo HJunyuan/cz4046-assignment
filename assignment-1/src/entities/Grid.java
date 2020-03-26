@@ -79,6 +79,32 @@ public class Grid {
 	}
 
 	/**
+	 * Get the 3 neighbours (UP, LEFT, RIGHT) with respect to a Policy direction.
+	 * Will make sure that returned neighbours are not walls.
+	 * 
+	 * @param currCell
+	 * @return [Intended Position, Right Angle (L), Right Angle (R)]
+	 */
+	public Cell[] getNeighboursOfCell(Cell currCell, int direction) {
+		Coordinate currCoord = currCell.getCoordinate();
+		Coordinate[] neighbourCoords = currCoord.getNeighbours(direction);
+
+		/* Make sure neighbour CellType is not a wall */
+		Cell[] neighbourCells = new Cell[neighbourCoords.length];
+		for (int n = 0; n < neighbourCoords.length; n++) {
+			Cell neighbourCell = this.getCell(neighbourCoords[n]);
+
+			/* If it's a wall, use current coordinate */
+			if (neighbourCell.getCellType() == CellType.WALL)
+				neighbourCoords[n] = currCell.getCoordinate();
+
+			neighbourCells[n] = this.getCell(neighbourCoords[n]);
+		}
+
+		return neighbourCells;
+	}
+
+	/**
 	 * Prints Grid in the console
 	 */
 	public void print() {
