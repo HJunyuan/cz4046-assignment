@@ -52,6 +52,33 @@ public class Grid {
 	}
 
 	/**
+	 * Get the 3 neighbours (UP, LEFT, RIGHT) with respect to the current Policy.
+	 * Will make sure that returned neighbours are not walls.
+	 * 
+	 * @param currCell
+	 * @return [Intended Position, Right Angle (L), Right Angle (R)]
+	 */
+	public Cell[] getNeighboursOfCell(Cell currCell) {
+		Coordinate currCoord = currCell.getCoordinate();
+		Policy currPolicy = currCell.getPolicy();
+		Coordinate[] neighbourCoords = currCoord.getNeighbours(currPolicy.getDirection());
+
+		/* Make sure neighbour CellType is not a wall */
+		Cell[] neighbourCells = new Cell[neighbourCoords.length];
+		for (int n = 0; n < neighbourCoords.length; n++) {
+			Cell neighbourCell = this.getCell(neighbourCoords[n]);
+
+			/* If it's a wall, use current coordinate */
+			if (neighbourCell.getCellType() == CellType.WALL)
+				neighbourCoords[n] = currCell.getCoordinate();
+
+			neighbourCells[n] = this.getCell(neighbourCoords[n]);
+		}
+
+		return neighbourCells;
+	}
+
+	/**
 	 * Prints Grid in the console
 	 */
 	public void print() {
@@ -63,7 +90,7 @@ public class Grid {
 					double utility = currCell.getUtility();
 					String cellType = currCell.getCellType().getSymbol();
 					String policy = currCell.getPolicy().getSymbol();
-					
+
 					System.out.printf("| " + cellType + " %7.3f " + policy, utility);
 				} else {
 					System.out.print("|            ");
@@ -92,5 +119,22 @@ public class Grid {
 		} catch (Exception e) {
 			System.out.println(e);
 		}
+	}
+
+	/**
+	 * Check if all utilities are equal to the provided <i>Grid</i>.
+	 * 
+	 * @param grid
+	 * @return
+	 */
+	public boolean isUtilityEqual(Grid grid) {
+		for (int c = 0; c < Constants.NUM_COL; c++) {
+			for (int r = 0; r < Constants.NUM_ROW; r++) {
+				if (this.getCell(new Coordinate(c, r)).getUtility() != grid.getCell(new Coordinate(c, r)).getUtility())
+					return false;
+			}
+		}
+
+		return true;
 	}
 }
