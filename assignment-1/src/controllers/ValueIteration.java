@@ -15,9 +15,6 @@ public class ValueIteration {
 	public static void main(String[] args) {
 		Grid grid = new Grid("preset-1.txt");
 
-		System.out.println("Original:");
-		grid.print();
-
 		runValueIteration(grid);
 	}
 
@@ -26,6 +23,10 @@ public class ValueIteration {
 		double maxChangeInUtility = 0;
 		int iteration = 1;
 		LogBuilder logger = new LogBuilder("ValueIteration", grid);
+		
+		System.out.println("Original:");
+		grid.print();
+		logger.add(grid);
 
 		do {
 			System.out.printf("Iteration: %d\n", iteration);
