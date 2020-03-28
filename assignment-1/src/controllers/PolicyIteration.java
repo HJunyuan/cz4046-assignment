@@ -4,6 +4,7 @@ import entities.Cell;
 import entities.Constants;
 import entities.Coordinate;
 import entities.Grid;
+import logger.LogBuilder;
 
 public class PolicyIteration {
 
@@ -13,15 +14,17 @@ public class PolicyIteration {
 	public static void main(String[] args) {
 		Grid grid = new Grid("preset-1.txt");
 
-		System.out.println("Original:");
-		grid.print();
-
 		runPolicyIteration(grid);
 	}
 
 	private static void runPolicyIteration(Grid grid) {
 		boolean didChange;
 		int iteration = 1;
+		LogBuilder logger = new LogBuilder("PolicyIteration", grid);
+		
+		System.out.println("Original:");
+		grid.print();
+		logger.add(grid);
 
 		do {
 			System.out.printf("Iteration %d:\n", iteration);
@@ -44,7 +47,10 @@ public class PolicyIteration {
 
 			iteration++;
 			grid.print();
+			logger.add(grid);
 		} while (didChange);
+		
+		logger.finalise();
 	}
 
 	/**
