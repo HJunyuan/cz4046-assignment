@@ -9,6 +9,9 @@ import logger.LogBuilder;
 
 public class ValueIteration {
 
+	/* Epsilon */
+	private final static float EPSILON = 62;
+
 	public static void main(String[] args) {
 		Grid grid = new Grid("preset-1.txt");
 
@@ -19,7 +22,7 @@ public class ValueIteration {
 	}
 
 	private static void runValueIteration(Grid grid) {
-		double threshold = Constants.EPSILON * ((1 - Constants.DISCOUNT_FACTOR) / Constants.DISCOUNT_FACTOR);
+		double threshold = EPSILON * ((1 - Constants.DISCOUNT_FACTOR) / Constants.DISCOUNT_FACTOR);
 		double maxChangeInUtility = 0;
 		int iteration = 1;
 		LogBuilder logger = new LogBuilder("ValueIteration");
@@ -48,7 +51,7 @@ public class ValueIteration {
 			System.out.printf("Maximum change in utility: %5.3f\n", maxChangeInUtility);
 			grid.print();
 			logger.add(grid);
-		} while (iteration <= 100); // maxChangeInUtility > threshold
+		} while (maxChangeInUtility > threshold);
 
 		logger.finalise();
 	}

@@ -6,7 +6,9 @@ import entities.Coordinate;
 import entities.Grid;
 
 public class PolicyIteration {
-	private static int k = 5;
+
+	/* K Value */
+	private final static int K = 4;
 
 	public static void main(String[] args) {
 		Grid grid = new Grid("preset-1.txt");
@@ -26,7 +28,7 @@ public class PolicyIteration {
 			didChange = false;
 
 			/* 1. Policy Evaluation */
-			policyEvaluation(grid, k);
+			policyEvaluation(grid, K);
 
 			/* 2. Policy Improvement */
 			for (int c = 0; c < Constants.NUM_COL; c++) {
