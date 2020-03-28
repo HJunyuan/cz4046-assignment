@@ -55,15 +55,19 @@ public class Cell extends Coordinate {
 		switch (type) {
 		case 'W':
 			this.cellType = CellType.WHITE;
+			this.setUtility(Constants.REWARD_WHITE);
 			break;
 		case 'G':
 			this.cellType = CellType.GREEN;
+			this.setUtility(Constants.REWARD_GREEN);
 			break;
 		case 'B':
 			this.cellType = CellType.BROWN;
+			this.setUtility(Constants.REWARD_BROWN);
 			break;
 		case 'X':
 			this.cellType = CellType.WALL;
+			this.setUtility(Constants.REWARD_WALL);
 			break;
 		}
 	}
