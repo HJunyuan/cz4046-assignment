@@ -25,7 +25,7 @@ public class ValueIteration {
 		double threshold = EPSILON * ((1 - Constants.DISCOUNT_FACTOR) / Constants.DISCOUNT_FACTOR);
 		double maxChangeInUtility = 0;
 		int iteration = 1;
-		LogBuilder logger = new LogBuilder("ValueIteration");
+		LogBuilder logger = new LogBuilder("ValueIteration", grid);
 
 		do {
 			System.out.printf("Iteration: %d\n", iteration);

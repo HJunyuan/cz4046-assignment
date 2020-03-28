@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import entities.CellType;
 import entities.Constants;
 import entities.Coordinate;
 import entities.Grid;
@@ -15,7 +16,7 @@ public class LogBuilder {
 	private List<String> headers;
 	private List<List<Double>> all_data;
 
-	public LogBuilder(String fileName) {
+	public LogBuilder(String fileName, Grid grid) {
 		Date date = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm");
 
@@ -26,20 +27,23 @@ public class LogBuilder {
 
 		for (int c = 0; c < Constants.NUM_COL; c++) {
 			for (int r = 0; r < Constants.NUM_ROW; r++) {
-				headers.add("(" + c + " : " + r + ")");
+				if (grid.getCell(new Coordinate(c, r)).getCellType() == CellType.WALL)
+					headers.add("\"Wall: (" + c + ", " + r + ")\"");
+				else
+					headers.add("\"State: (" + c + ", " + r + ")\"");
 			}
 		}
 	}
 
 	public void add(Grid grid) {
-		List<Double> incoming = new ArrayList<Double>(); 
-		
+		List<Double> incoming = new ArrayList<Double>();
+
 		for (int c = 0; c < Constants.NUM_COL; c++) {
 			for (int r = 0; r < Constants.NUM_ROW; r++) {
 				incoming.add(grid.getCell(new Coordinate(c, r)).getUtility());
 			}
 		}
-		
+
 		this.all_data.add(incoming);
 	}
 
