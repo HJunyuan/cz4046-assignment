@@ -1,6 +1,7 @@
 package controllers;
 
 import entities.Cell;
+import entities.CellType;
 import entities.Constants;
 import entities.Coordinate;
 import entities.Grid;
@@ -38,6 +39,10 @@ public class PolicyIteration {
 				for (int r = 0; r < Constants.NUM_ROW; r++) {
 					Cell currCell = grid.getCell(new Coordinate(c, r));
 
+					/* Skip if currCell is a wall */
+					if (currCell.getCellType() == CellType.WALL)
+						continue;
+					
 					boolean changed = policyImprovement(currCell, grid);
 
 					if (changed)
@@ -65,7 +70,11 @@ public class PolicyIteration {
 				for (int r = 0; r < Constants.NUM_ROW; r++) {
 					/* 1. Get current reward & policy */
 					Cell currCell = grid.getCell(new Coordinate(c, r));
-
+					
+					/* Skip if currCell is a wall */
+					if (currCell.getCellType() == CellType.WALL)
+						continue;
+					
 					/*
 					 * 2. Sum up the 3 neighbours (i.e. UP, LEFT, RIGHT) based on the current policy
 					 */
