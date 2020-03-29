@@ -5,18 +5,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Scanner;
 
-public class Grid {
+public class Maze {
 	Cell[][] cells;
 	int numCol, numRow;
 
 	/**
-	 * Initialise Grid with set number of columns and rows. Cells are set to
+	 * Initialise Maze with set number of columns and rows. Cells are set to
 	 * default.
 	 * 
 	 * @param col
 	 * @param row
 	 */
-	public Grid() {
+	public Maze() {
 		if (numCol < 0 || numRow < 0)
 			throw new IllegalArgumentException("Col and Row must be a positive integer.");
 
@@ -32,7 +32,7 @@ public class Grid {
 		}
 	}
 
-	public Grid(String fileName) {
+	public Maze(String fileName) {
 		this();
 		this.importMapFromFile(fileName);
 	}
@@ -96,7 +96,7 @@ public class Grid {
 	}
 
 	/**
-	 * Prints Grid in the console
+	 * Prints Maze in the console
 	 */
 	public void print() {
 		for (int r = 0; r < this.numRow; r++) {
@@ -139,15 +139,15 @@ public class Grid {
 	}
 
 	/**
-	 * Check if all utilities are equal to the provided <i>Grid</i>.
+	 * Check if all utilities are equal to the provided <i>Maze</i>.
 	 * 
-	 * @param grid
+	 * @param maze
 	 * @return
 	 */
-	public boolean isUtilityEqual(Grid grid) {
+	public boolean isUtilityEqual(Maze maze) {
 		for (int c = 0; c < Constants.NUM_COL; c++) {
 			for (int r = 0; r < Constants.NUM_ROW; r++) {
-				if (this.getCell(new Coordinate(c, r)).getUtility() != grid.getCell(new Coordinate(c, r)).getUtility())
+				if (this.getCell(new Coordinate(c, r)).getUtility() != maze.getCell(new Coordinate(c, r)).getUtility())
 					return false;
 			}
 		}

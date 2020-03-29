@@ -4,7 +4,7 @@ import entities.Cell;
 import entities.CellType;
 import entities.Constants;
 import entities.Coordinate;
-import entities.Grid;
+import entities.Maze;
 import logger.LogBuilder;
 
 public class PolicyIteration {
@@ -13,37 +13,37 @@ public class PolicyIteration {
 	private final static int K = 4;
 
 	public static void main(String[] args) {
-		Grid grid = new Grid("preset-1.txt");
+		Maze maze = new Maze("preset-1.txt");
 
-		runPolicyIteration(grid);
+		runPolicyIteration(maze);
 	}
 
-	private static void runPolicyIteration(Grid grid) {
+	private static void runPolicyIteration(Maze maze) {
 		boolean didChange;
 		int iteration = 1;
-		LogBuilder logger = new LogBuilder("PolicyIteration", grid);
+		LogBuilder logger = new LogBuilder("PolicyIteration", maze);
 		
 		System.out.println("Original:");
-		grid.print();
-		logger.add(grid);
+		maze.print();
+		logger.add(maze);
 
 		do {
 			System.out.printf("Iteration %d:\n", iteration);
 			didChange = false;
 
 			/* 1. Policy Evaluation */
-			policyEvaluation(grid, K);
+			policyEvaluation(maze, K);
 
 			/* 2. Policy Improvement */
 			for (int c = 0; c < Constants.NUM_COL; c++) {
 				for (int r = 0; r < Constants.NUM_ROW; r++) {
-					Cell currCell = grid.getCell(new Coordinate(c, r));
+					Cell currCell = maze.getCell(new Coordinate(c, r));
 
 					/* Skip if currCell is a wall */
 					if (currCell.getCellType() == CellType.WALL)
 						continue;
 					
-					boolean changed = policyImprovement(currCell, grid);
+					boolean changed = policyImprovement(currCell, maze);
 
 					if (changed)
 						didChange = true;
@@ -51,8 +51,8 @@ public class PolicyIteration {
 			}
 
 			iteration++;
-			grid.print();
-			logger.add(grid);
+			maze.print();
+			logger.add(maze);
 		} while (didChange);
 		
 		logger.finalise();
@@ -61,15 +61,15 @@ public class PolicyIteration {
 	/**
 	 * Calculates utilities for a given Policy.
 	 * 
-	 * @param grid
+	 * @param maze
 	 * @return
 	 */
-	private static void policyEvaluation(Grid grid, int k) {
+	private static void policyEvaluation(Maze maze, int k) {
 		for (int i = 0; i < k; i++) {
 			for (int c = 0; c < Constants.NUM_COL; c++) {
 				for (int r = 0; r < Constants.NUM_ROW; r++) {
 					/* 1. Get current reward & policy */
-					Cell currCell = grid.getCell(new Coordinate(c, r));
+					Cell currCell = maze.getCell(new Coordinate(c, r));
 					
 					/* Skip if currCell is a wall */
 					if (currCell.getCellType() == CellType.WALL)
@@ -78,7 +78,7 @@ public class PolicyIteration {
 					/*
 					 * 2. Sum up the 3 neighbours (i.e. UP, LEFT, RIGHT) based on the current policy
 					 */
-					Cell[] neighbours = grid.getNeighboursOfCell(currCell);
+					Cell[] neighbours = maze.getNeighboursOfCell(currCell);
 					double up = Constants.PROBABILITY_UP * neighbours[0].getUtility();
 					double left = Constants.PROBABILITY_LEFT * neighbours[1].getUtility();
 					double right = Constants.PROBABILITY_RIGHT * neighbours[2].getUtility();
@@ -94,14 +94,14 @@ public class PolicyIteration {
 	/**
 	 * 
 	 * @param currCell
-	 * @param grid
+	 * @param maze
 	 * @return <i>true</i> if policy is changed
 	 */
-	private static boolean policyImprovement(Cell currCell, Grid grid) {
+	private static boolean policyImprovement(Cell currCell, Maze maze) {
 		/* 1. Find the maximum possible sub-utility */
 		double[] maxSubUtility = new double[Coordinate.TOTAL_DIRECTIONS];
 		for (int dir = 0; dir < Coordinate.TOTAL_DIRECTIONS; dir++) {
-			Cell[] neighbours = grid.getNeighboursOfCell(currCell, dir);
+			Cell[] neighbours = maze.getNeighboursOfCell(currCell, dir);
 			double up = Constants.PROBABILITY_UP * neighbours[0].getUtility();
 			double left = Constants.PROBABILITY_LEFT * neighbours[1].getUtility();
 			double right = Constants.PROBABILITY_RIGHT * neighbours[2].getUtility();
@@ -116,7 +116,7 @@ public class PolicyIteration {
 		}
 
 		/* 2. Current sub-utility */
-		Cell[] neighbours = grid.getNeighboursOfCell(currCell);
+		Cell[] neighbours = maze.getNeighboursOfCell(currCell);
 		double up = Constants.PROBABILITY_UP * neighbours[0].getUtility();
 		double left = Constants.PROBABILITY_LEFT * neighbours[1].getUtility();
 		double right = Constants.PROBABILITY_RIGHT * neighbours[2].getUtility();

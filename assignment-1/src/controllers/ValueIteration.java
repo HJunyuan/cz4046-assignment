@@ -4,7 +4,7 @@ import entities.Cell;
 import entities.CellType;
 import entities.Constants;
 import entities.Coordinate;
-import entities.Grid;
+import entities.Maze;
 import logger.LogBuilder;
 
 public class ValueIteration {
@@ -13,20 +13,20 @@ public class ValueIteration {
 	private final static float EPSILON = 62;
 
 	public static void main(String[] args) {
-		Grid grid = new Grid("preset-1.txt");
+		Maze maze = new Maze("preset-1.txt");
 
-		runValueIteration(grid);
+		runValueIteration(maze);
 	}
 
-	private static void runValueIteration(Grid grid) {
+	private static void runValueIteration(Maze maze) {
 		double threshold = EPSILON * ((1 - Constants.DISCOUNT_FACTOR) / Constants.DISCOUNT_FACTOR);
 		double maxChangeInUtility = 0;
 		int iteration = 1;
-		LogBuilder logger = new LogBuilder("ValueIteration", grid);
+		LogBuilder logger = new LogBuilder("ValueIteration", maze);
 		
 		System.out.println("Original:");
-		grid.print();
-		logger.add(grid);
+		maze.print();
+		logger.add(maze);
 
 		do {
 			System.out.printf("Iteration: %d\n", iteration);
@@ -35,14 +35,14 @@ public class ValueIteration {
 			/* Runs 1 iteration */
 			for (int c = 0; c < Constants.NUM_COL; c++) {
 				for (int r = 0; r < Constants.NUM_ROW; r++) {
-					Cell currCell = grid.getCell(new Coordinate(c, r));
+					Cell currCell = maze.getCell(new Coordinate(c, r));
 
 					/* Skip if currCell is a wall */
 					if (currCell.getCellType() == CellType.WALL)
 						continue;
 
 					/* Find maximum change in utility */
-					double changeInUtility = calculateUtility(currCell, grid);
+					double changeInUtility = calculateUtility(currCell, maze);
 					if (changeInUtility > maxChangeInUtility)
 						maxChangeInUtility = changeInUtility;
 				}
@@ -50,8 +50,8 @@ public class ValueIteration {
 
 			iteration++;
 			System.out.printf("Maximum change in utility: %5.3f\n", maxChangeInUtility);
-			grid.print();
-			logger.add(grid);
+			maze.print();
+			logger.add(maze);
 		} while (maxChangeInUtility > threshold);
 
 		logger.finalise();
@@ -61,16 +61,16 @@ public class ValueIteration {
 	 * Calculate the utility of the given <i>Cell</i>.
 	 * 
 	 * @param currCell
-	 * @param grid
+	 * @param maze
 	 * @return The difference prevUtility and newUtility
 	 */
-	private static double calculateUtility(Cell currCell, Grid grid) {
+	private static double calculateUtility(Cell currCell, Maze maze) {
 		double[] subUtilities = new double[Coordinate.TOTAL_DIRECTIONS];
 
 		/* 1. Find all possible utilities (i.e. 4 possible directions) */
 		for (int dir = 0; dir < Coordinate.TOTAL_DIRECTIONS; dir++) {
 			/* 1a. Sum up the 3 neighbours (i.e. UP, LEFT, RIGHT) */
-			Cell[] neighbours = grid.getNeighboursOfCell(currCell, dir);
+			Cell[] neighbours = maze.getNeighboursOfCell(currCell, dir);
 			double up = Constants.PROBABILITY_UP * neighbours[0].getUtility();
 			double left = Constants.PROBABILITY_LEFT * neighbours[1].getUtility();
 			double right = Constants.PROBABILITY_RIGHT * neighbours[2].getUtility();

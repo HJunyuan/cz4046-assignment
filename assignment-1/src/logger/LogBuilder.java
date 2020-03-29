@@ -9,7 +9,7 @@ import java.util.List;
 import entities.CellType;
 import entities.Constants;
 import entities.Coordinate;
-import entities.Grid;
+import entities.Maze;
 
 public class LogBuilder {
 	private String fileName;
@@ -17,7 +17,7 @@ public class LogBuilder {
 	private List<String> headers;
 	private List<List<Double>> data;
 
-	public LogBuilder(String fileName, Grid grid) {
+	public LogBuilder(String fileName, Maze maze) {
 		Date date = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm");
 
@@ -28,7 +28,7 @@ public class LogBuilder {
 
 		for (int c = 0; c < Constants.NUM_COL; c++) {
 			for (int r = 0; r < Constants.NUM_ROW; r++) {
-				if (grid.getCell(new Coordinate(c, r)).getCellType() == CellType.WALL)
+				if (maze.getCell(new Coordinate(c, r)).getCellType() == CellType.WALL)
 					headers.add("\"Wall: (" + c + ", " + r + ")\"");
 				else
 					headers.add("\"State: (" + c + ", " + r + ")\"");
@@ -36,12 +36,12 @@ public class LogBuilder {
 		}
 	}
 
-	public void add(Grid grid) {
+	public void add(Maze maze) {
 		List<Double> incoming = new ArrayList<Double>();
 
 		for (int c = 0; c < Constants.NUM_COL; c++) {
 			for (int r = 0; r < Constants.NUM_ROW; r++) {
-				incoming.add(grid.getCell(new Coordinate(c, r)).getUtility());
+				incoming.add(maze.getCell(new Coordinate(c, r)).getUtility());
 			}
 		}
 
