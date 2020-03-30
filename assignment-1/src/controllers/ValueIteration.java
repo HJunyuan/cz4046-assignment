@@ -10,7 +10,9 @@ import logger.LogBuilder;
 public class ValueIteration {
 
 	/* Epsilon */
-	private final static float EPSILON = 62;
+	private final static float C = 62;
+	private final static float R_MAX = 1;
+	private final static float EPSILON = C * R_MAX;
 
 	public static void main(String[] args) {
 		Maze maze = new Maze("preset-1.txt");
