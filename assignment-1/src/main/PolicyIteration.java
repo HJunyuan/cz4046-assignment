@@ -1,4 +1,4 @@
-package controllers;
+package main;
 
 import entities.Cell;
 import entities.CellType;
