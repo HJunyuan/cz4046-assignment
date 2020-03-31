@@ -137,21 +137,4 @@ public class Maze {
 			System.out.println(e);
 		}
 	}
-
-	/**
-	 * Check if all utilities are equal to the provided <i>Maze</i>.
-	 * 
-	 * @param maze
-	 * @return
-	 */
-	public boolean isUtilityEqual(Maze maze) {
-		for (int c = 0; c < Constants.NUM_COL; c++) {
-			for (int r = 0; r < Constants.NUM_ROW; r++) {
-				if (this.getCell(new Coordinate(c, r)).getUtility() != maze.getCell(new Coordinate(c, r)).getUtility())
-					return false;
-			}
-		}
-
-		return true;
-	}
 }
