@@ -140,6 +140,14 @@ public class ThreePrisonersDilemma {
 		int selectAction(int n, int[] myHistory, int[] oppHistory1, int[] oppHistory2) {
 			if (n == 0)
 				return 0; // cooperate by default
+			
+			/* 0. Count all scores */
+			int[] scores = new int[3];
+			for (int i = 0; i < n; i++) {
+				scores[0] += payoff[myHistory[i]][oppHistory1[i]][oppHistory2[i]];
+				scores[1] += payoff[oppHistory1[i]][oppHistory2[i]][myHistory[i]];
+				scores[2] += payoff[oppHistory2[i]][myHistory[i]][oppHistory1[i]];
+			}
 
 			/* 1. Count number of times everyone cooperates */
 			int iCoop = 0;
@@ -158,29 +166,18 @@ public class ThreePrisonersDilemma {
 			float perOpp1Coop = opp1Coop / n * 100;
 			float perOpp2Coop = opp2Coop / n * 100;
 
-			/* 3. Check if opp1 & opp2 are cooperating */
-			boolean opp1IsCoop = false, opp2IsCoop = false;
-			if (perOpp1Coop >= 40)
-				opp1IsCoop = true;
-			if (perOpp2Coop >= 40)
-				opp2IsCoop = true;
-
-			/* 4. Rule (based on popularity) */
+			/* 3. Rule (based on popularity) */
 			int choice;
 			// If both are mostly cooperating, cooperate
-			if (opp1IsCoop && opp2IsCoop)
+			if (perOpp1Coop > 50 && perOpp2Coop > 50)
 				choice = 0;
 			// If both are mostly defecting, defect
-			else if (!opp1IsCoop && !opp2IsCoop)
+			else if (perOpp1Coop < 50 && perOpp2Coop < 50)
 				choice = 1;
 			// Else defect
-			else 
+			else
 				choice = 1;
-
-			/* 5. Override defect: Do not exceed defects by 50% */
-//			if (perICoop < 0.5 && n > 50)
-//				choice = 0;
-
+			
 			return choice;
 		}
 	}
@@ -249,18 +246,22 @@ public class ThreePrisonersDilemma {
 	/* Finally, the remaining code actually runs the tournament. */
 
 	public static void main(String[] args) {
-		int player6Rank = 0;
-		int numTournaments = 50;
+		int[] rankings = new int[7];
+		int numTournaments = 200;
 
 		for (int i = 1; i <= numTournaments; i++) {
 			System.out.println("Tournament: " + i);
 			ThreePrisonersDilemma instance = new ThreePrisonersDilemma();
-			player6Rank += instance.runTournament();
+			int rank = instance.runTournament();
 			System.out.println();
+
+			/* Update rankings */
+			rankings[rank]++;
 		}
 
-		float averageRank = player6Rank / (float) numTournaments;
-		System.out.println("Player 6 average ranking: " + averageRank);
+		System.out.println("Player 6 1st: " + rankings[0] / (float) numTournaments * 100 + "%");
+		System.out.println("Player 6 2nd: " + rankings[1] / (float) numTournaments * 100 + "%");
+		System.out.println("Player 6 3rd: " + rankings[2] / (float) numTournaments * 100 + "%");
 	}
 
 	boolean verbose = false; // set verbose = false if you get too much text output
@@ -318,7 +319,7 @@ public class ThreePrisonersDilemma {
 				break;
 			}
 		}
-		return rank + 1;
+		return rank;
 	} // end of runTournament()
 
 } // end of class PrisonersDilemma
