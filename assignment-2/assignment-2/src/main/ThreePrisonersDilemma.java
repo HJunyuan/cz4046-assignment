@@ -141,32 +141,47 @@ public class ThreePrisonersDilemma {
 			if (n == 0)
 				return 0; // cooperate by default
 
-			/* 1. Count number of times opp1 & opp2 cooperates */
+			/* 1. Count number of times everyone cooperates */
+			int iCoop = 0;
 			int opp1Coop = 0, opp2Coop = 0;
 			for (int i = 0; i < n; i++) {
+				if (myHistory[i] == 0)
+					iCoop++;
 				if (oppHistory1[i] == 0)
 					opp1Coop++;
 				if (oppHistory2[i] == 0)
 					opp2Coop++;
 			}
 
-			/* 2. Check if opp1 & opp2 are cooperating */
+			/* 2. Calculate percentage of cooperating */
+			float perICoop = iCoop / n * 100;
+			float perOpp1Coop = opp1Coop / n * 100;
+			float perOpp2Coop = opp2Coop / n * 100;
+
+			/* 3. Check if opp1 & opp2 are cooperating */
 			boolean opp1IsCoop = false, opp2IsCoop = false;
-			if (opp1Coop > n - opp1Coop)
+			if (perOpp1Coop >= 40)
 				opp1IsCoop = true;
-			if (opp2Coop > n - opp2Coop)
+			if (perOpp2Coop >= 40)
 				opp2IsCoop = true;
 
-			/* 3. Rule (based on popularity) */
+			/* 4. Rule (based on popularity) */
+			int choice;
 			// If both are mostly cooperating, cooperate
 			if (opp1IsCoop && opp2IsCoop)
-				return 0;
+				choice = 0;
 			// If both are mostly defecting, defect
 			else if (!opp1IsCoop && !opp2IsCoop)
-				return 1;
-			// Else, defect
-			else
-				return 1;
+				choice = 1;
+			// Else defect
+			else 
+				choice = 1;
+
+			/* 5. Override defect: Do not exceed defects by 50% */
+//			if (perICoop < 0.5 && n > 50)
+//				choice = 0;
+
+			return choice;
 		}
 	}
 
@@ -234,17 +249,23 @@ public class ThreePrisonersDilemma {
 	/* Finally, the remaining code actually runs the tournament. */
 
 	public static void main(String[] args) {
-		for (int i = 1; i <= 10; i++) {
-			System.out.println("Round: " + i);
+		int player6Rank = 0;
+		int numTournaments = 50;
+
+		for (int i = 1; i <= numTournaments; i++) {
+			System.out.println("Tournament: " + i);
 			ThreePrisonersDilemma instance = new ThreePrisonersDilemma();
-			instance.runTournament();
+			player6Rank += instance.runTournament();
 			System.out.println();
 		}
+
+		float averageRank = player6Rank / (float) numTournaments;
+		System.out.println("Player 6 average ranking: " + averageRank);
 	}
 
 	boolean verbose = false; // set verbose = false if you get too much text output
 
-	void runTournament() {
+	int runTournament() {
 		float[] totalScore = new float[numPlayers];
 
 		// This loop plays each triple of players against each other.
@@ -289,6 +310,15 @@ public class ThreePrisonersDilemma {
 		for (int i = 0; i < numPlayers; i++)
 			System.out.println(makePlayer(sortedOrder[i]).name() + ": " + totalScore[sortedOrder[i]] + " points.");
 
+		// Return rank of player 6
+		int rank = 0;
+		for (int i = 0; i < numPlayers; i++) {
+			if (sortedOrder[i] == 6) {
+				rank = i;
+				break;
+			}
+		}
+		return rank + 1;
 	} // end of runTournament()
 
 } // end of class PrisonersDilemma
