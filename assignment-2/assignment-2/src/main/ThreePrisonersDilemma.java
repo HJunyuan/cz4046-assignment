@@ -134,9 +134,20 @@ public class ThreePrisonersDilemma {
 	 *
 	 */
 	class Huang_KyleJunyuan_Player extends Player {
+		float calCoopPercentage(int[] history) {
+			int cooperates = 0;
+			int length = history.length;
+
+			for (int i = 0; i < length; i++)
+				if (history[i] == 0)
+					cooperates++;
+
+			return cooperates / length * 100;
+		}
+
 		int selectAction(int n, int[] myHistory, int[] oppHistory1, int[] oppHistory2) {
 			if (n == 0)
-				return 1; // defect by default
+				return 0; // cooperate by default
 
 			/* 0. Count all scores */
 			int[] scores = new int[3];
@@ -149,39 +160,21 @@ public class ThreePrisonersDilemma {
 			/* 1. Defect if score is lower */
 			if (scores[0] < scores[1] || scores[0] < scores[2])
 				return 1;
-			else
-				return 0;
 
-//			/* 2. Count number of times everyone cooperates */
-//			int iCoop = 0;
-//			int opp1Coop = 0, opp2Coop = 0;
-//			for (int i = 0; i < n; i++) {
-//				if (myHistory[i] == 0)
-//					iCoop++;
-//				if (oppHistory1[i] == 0)
-//					opp1Coop++;
-//				if (oppHistory2[i] == 0)
-//					opp2Coop++;
-//			}
-//
-//			/* 3. Calculate percentage of cooperating */
-//			float perICoop = iCoop / n * 100;
-//			float perOpp1Coop = opp1Coop / n * 100;
-//			float perOpp2Coop = opp2Coop / n * 100;
-//
-//			/* 4. Rule (based on popularity) */
-//			int choice;
-//			// If both are mostly cooperating, cooperate
-//			if (perOpp1Coop > 50 && perOpp2Coop > 50)
-//				choice = 0;
-//			// If both are mostly defecting, defect
-//			else if (perOpp1Coop < 50 && perOpp2Coop < 50)
-//				choice = 1;
-//			// Else defect
-//			else
-//				choice = 1;
-//
-//			return choice;
+			/* 2. Calculate percentage of cooperating */
+			float perOpp1Coop = calCoopPercentage(oppHistory1);
+			float perOpp2Coop = calCoopPercentage(oppHistory2);
+
+			/* 3. Rule (based on popularity) */
+			// If both are mostly cooperating, cooperate
+			if (perOpp1Coop > 50 && perOpp2Coop > 50)
+				return 0;
+			// If both are mostly defecting, defect
+			else if (perOpp1Coop < 50 && perOpp2Coop < 50)
+				return 1;
+			// Else defect
+			else
+				return 1;
 		}
 	}
 
