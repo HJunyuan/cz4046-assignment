@@ -142,7 +142,7 @@ public class ThreePrisonersDilemma {
 				if (history[i] == 0)
 					cooperates++;
 
-			return cooperates / length * 100;
+			return (float) cooperates / length * 100;
 		}
 
 		int selectAction(int n, int[] myHistory, int[] oppHistory1, int[] oppHistory2) {
@@ -167,7 +167,7 @@ public class ThreePrisonersDilemma {
 
 			/* 3. Rule (based on popularity) */
 			// If both are mostly cooperating, cooperate
-			if (perOpp1Coop > 50 && perOpp2Coop > 50)
+			if (perOpp1Coop > 90 && perOpp2Coop > 90)
 				return 0;
 			// If both are mostly defecting, defect
 			else if (perOpp1Coop < 50 && perOpp2Coop < 50)
@@ -255,6 +255,7 @@ public class ThreePrisonersDilemma {
 			ranks[rank]++;
 		}
 
+		System.out.println("============ Ranking Probabilities ============");
 		System.out.println("1st: " + ranks[0] / (float) numTournaments * 100 + "%");
 		System.out.println("2nd: " + ranks[1] / (float) numTournaments * 100 + "%");
 		System.out.println("3rd: " + ranks[2] / (float) numTournaments * 100 + "%");
