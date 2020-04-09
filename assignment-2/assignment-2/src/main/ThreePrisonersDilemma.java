@@ -3,14 +3,13 @@ package main;
 public class ThreePrisonersDilemma {
 
 	/*
-	 * This Java program models the two-player Prisoner's Dilemma game. We use the
-	 * integer "0" to represent cooperation, and "1" to represent defection.
+	 * This Java program models the two-player Prisoner's Dilemma game. We use the integer "0" to
+	 * represent cooperation, and "1" to represent defection.
 	 * 
-	 * Recall that in the 2-players dilemma, U(DC) > U(CC) > U(DD) > U(CD), where we
-	 * give the payoff for the first player in the list. We want the three-player
-	 * game to resemble the 2-player game whenever one player's response is fixed,
-	 * and we also want symmetry, so U(CCD) = U(CDC) etc. This gives the unique
-	 * ordering
+	 * Recall that in the 2-players dilemma, U(DC) > U(CC) > U(DD) > U(CD), where we give the payoff for
+	 * the first player in the list. We want the three-player game to resemble the 2-player game
+	 * whenever one player's response is fixed, and we also want symmetry, so U(CCD) = U(CDC) etc. This
+	 * gives the unique ordering
 	 * 
 	 * U(DCC) > U(CCC) > U(DDC) > U(CDC) > U(DDD) > U(CDD)
 	 * 
@@ -23,15 +22,13 @@ public class ThreePrisonersDilemma {
 					{ 5, 2 } } };// payoffs when first and second players defect
 
 	/*
-	 * So payoff[i][j][k] represents the payoff to player 1 when the first player's
-	 * action is i, the second player's action is j, and the third player's action
-	 * is k.
+	 * So payoff[i][j][k] represents the payoff to player 1 when the first player's action is i, the
+	 * second player's action is j, and the third player's action is k.
 	 * 
-	 * In this simulation, triples of players will play each other repeatedly in a
-	 * 'match'. A match consists of about 100 rounds, and your score from that match
-	 * is the average of the payoffs from each round of that match. For each round,
-	 * your strategy is given a list of the previous plays (so you can remember what
-	 * your opponent did) and must compute the next action.
+	 * In this simulation, triples of players will play each other repeatedly in a 'match'. A match
+	 * consists of about 100 rounds, and your score from that match is the average of the payoffs from
+	 * each round of that match. For each round, your strategy is given a list of the previous plays (so
+	 * you can remember what your opponent did) and must compute the next action.
 	 */
 
 	abstract class Player {
@@ -131,7 +128,7 @@ public class ThreePrisonersDilemma {
 	}
 
 	/**
-	 * Assignment 2: New strategy
+	 * Assignment 2: Kyle's Strategy
 	 * 
 	 * @author Kyle Huang Junyuan (U1721717G)
 	 *
@@ -139,7 +136,7 @@ public class ThreePrisonersDilemma {
 	class Huang_KyleJunyuan_Player extends Player {
 		int selectAction(int n, int[] myHistory, int[] oppHistory1, int[] oppHistory2) {
 			if (n == 0)
-				return 0; // cooperate by default
+				return 1; // defect by default
 
 			/* 0. Count all scores */
 			int[] scores = new int[3];
@@ -149,120 +146,48 @@ public class ThreePrisonersDilemma {
 				scores[2] += payoff[oppHistory2[i]][myHistory[i]][oppHistory1[i]];
 			}
 
-			/* 1. Count number of times everyone cooperates */
-			int iCoop = 0;
-			int opp1Coop = 0, opp2Coop = 0;
-			for (int i = 0; i < n; i++) {
-				if (myHistory[i] == 0)
-					iCoop++;
-				if (oppHistory1[i] == 0)
-					opp1Coop++;
-				if (oppHistory2[i] == 0)
-					opp2Coop++;
-			}
-
-			/* 2. Calculate percentage of cooperating */
-			float perICoop = iCoop / n * 100;
-			float perOpp1Coop = opp1Coop / n * 100;
-			float perOpp2Coop = opp2Coop / n * 100;
-
-			/* 3. Rule (based on popularity) */
-			int choice;
-			// If both are mostly cooperating, cooperate
-			if (perOpp1Coop > 50 && perOpp2Coop > 50)
-				choice = 0;
-			// If both are mostly defecting, defect
-			else if (perOpp1Coop < 50 && perOpp2Coop < 50)
-				choice = 1;
-			// Else defect
+			/* 1. Defect if score is lower */
+			if (scores[0] < scores[1] || scores[0] < scores[2])
+				return 1;
 			else
-				choice = 1;
+				return 0;
 
-			return choice;
-		}
-	}
-
-	class WongJunYong_Harrison_Player extends Player {
-
-		// 0 0 0 - 6 points
-		// 0 0 1 - 3 points
-		// 0 1 0 - 3 points
-		// 0 1 1 - 0 points
-		// 1 0 0 - 8 points
-		// 1 0 1 - 5 points
-		// 1 1 0 - 5 points
-		// 1 1 1 - 2 points
-
-		private boolean angryMode = false;
-
-		int backstabPlayers(int n, int[] myHistory, int[] oppHistory1, int[] oppHistory2) {
-			// detect players if he try to cooperate.
-			if (n > 4) {
-				// get previous
-				if ((oppHistory1[oppHistory1.length - 1] == 0 && oppHistory1[oppHistory1.length - 2] == 0
-						&& oppHistory1[oppHistory1.length - 3] == 0 && oppHistory1[oppHistory1.length - 4] == 0)
-						&& (oppHistory2[oppHistory2.length - 1] == 0 && oppHistory2[oppHistory2.length - 2] == 0
-								&& oppHistory2[oppHistory2.length - 3] == 0
-								&& oppHistory2[oppHistory2.length - 4] == 0)) {
-					return 1;
-				}
-
-//				if ((oppHistory1[oppHistory1.length - 1] == 0 &&
-//						oppHistory2[oppHistory2.length - 1] == 1) || 
-//						(oppHistory1[oppHistory1.length - 1] == 1 && oppHistory2[oppHistory2.length - 1] == 0)) {
-//					return 1;
-//				}
-
-			}
-
-			// dont backstab players
-			return 0;
-		}
-
-		float[] calculateTotalPoints(int n, int[] myHistory, int[] oppHistory1, int[] oppHistory2) {
-			float ScoreA = 0, ScoreB = 0, ScoreC = 0;
-			float[] totalScore = new float[3];
-
-			for (int i = 0; i < n; i++) {
-				ScoreA = ScoreA + payoff[myHistory[i]][oppHistory1[i]][oppHistory2[i]];
-				ScoreB = ScoreB + payoff[oppHistory1[i]][oppHistory2[i]][myHistory[i]];
-				ScoreC = ScoreC + payoff[oppHistory2[i]][myHistory[i]][oppHistory1[i]];
-			}
-
-			totalScore[0] = ScoreA;
-			totalScore[1] = ScoreB;
-			totalScore[2] = ScoreC;
-			return totalScore;
-		}
-
-		int selectAction(int n, int[] myHistory, int[] oppHistory1, int[] oppHistory2) {
-			// first round
-			if (n == 0) {
-				return 1;
-			}
-
-			if (n > 1) {
-				// caluclate points
-				float[] totalScore = calculateTotalPoints(n, myHistory, oppHistory1, oppHistory2);
-				if (totalScore[2] > totalScore[0] || totalScore[1] > totalScore[0]) {
-					angryMode = true;
-				} else {
-					angryMode = false;
-				}
-			}
-
-			if (angryMode == true) {
-				return 1;
-			} else {
-				return backstabPlayers(n, myHistory, oppHistory1, oppHistory2);
-			}
-
+//			/* 2. Count number of times everyone cooperates */
+//			int iCoop = 0;
+//			int opp1Coop = 0, opp2Coop = 0;
+//			for (int i = 0; i < n; i++) {
+//				if (myHistory[i] == 0)
+//					iCoop++;
+//				if (oppHistory1[i] == 0)
+//					opp1Coop++;
+//				if (oppHistory2[i] == 0)
+//					opp2Coop++;
+//			}
+//
+//			/* 3. Calculate percentage of cooperating */
+//			float perICoop = iCoop / n * 100;
+//			float perOpp1Coop = opp1Coop / n * 100;
+//			float perOpp2Coop = opp2Coop / n * 100;
+//
+//			/* 4. Rule (based on popularity) */
+//			int choice;
+//			// If both are mostly cooperating, cooperate
+//			if (perOpp1Coop > 50 && perOpp2Coop > 50)
+//				choice = 0;
+//			// If both are mostly defecting, defect
+//			else if (perOpp1Coop < 50 && perOpp2Coop < 50)
+//				choice = 1;
+//			// Else defect
+//			else
+//				choice = 1;
+//
+//			return choice;
 		}
 	}
 
 	/*
-	 * In our tournament, each pair of strategies will play one match against each
-	 * other. This procedure simulates a single match and returns the scores.
+	 * In our tournament, each pair of strategies will play one match against each other. This procedure
+	 * simulates a single match and returns the scores.
 	 */
 	float[] scoresOfMatch(Player A, Player B, Player C, int rounds) {
 		int[] HistoryA = new int[0], HistoryB = new int[0], HistoryC = new int[0];
@@ -294,12 +219,12 @@ public class ThreePrisonersDilemma {
 	}
 
 	/*
-	 * The procedure makePlayer is used to reset each of the Players (strategies) in
-	 * between matches. When you add your own strategy, you will need to add a new
-	 * entry to makePlayer, and change numPlayers.
+	 * The procedure makePlayer is used to reset each of the Players (strategies) in between matches.
+	 * When you add your own strategy, you will need to add a new entry to makePlayer, and change
+	 * numPlayers.
 	 */
 
-	int numPlayers = 8;
+	int numPlayers = 7;
 
 	Player makePlayer(int which) {
 		switch (which) {
@@ -317,8 +242,6 @@ public class ThreePrisonersDilemma {
 			return new T4TPlayer();
 		case 6:
 			return new Huang_KyleJunyuan_Player();
-		case 7:
-			return new WongJunYong_Harrison_Player();
 		}
 		throw new RuntimeException("Bad argument passed to makePlayer");
 	}
@@ -326,7 +249,7 @@ public class ThreePrisonersDilemma {
 	/* Finally, the remaining code actually runs the tournament. */
 
 	public static void main(String[] args) {
-		int[] ranks = new int[8];
+		int[] ranks = new int[7];
 		int numTournaments = 200;
 
 		for (int i = 1; i <= numTournaments; i++) {
