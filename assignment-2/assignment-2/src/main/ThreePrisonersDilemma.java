@@ -140,7 +140,7 @@ public class ThreePrisonersDilemma {
 		int selectAction(int n, int[] myHistory, int[] oppHistory1, int[] oppHistory2) {
 			if (n == 0)
 				return 0; // cooperate by default
-			
+
 			/* 0. Count all scores */
 			int[] scores = new int[3];
 			for (int i = 0; i < n; i++) {
@@ -177,8 +177,86 @@ public class ThreePrisonersDilemma {
 			// Else defect
 			else
 				choice = 1;
-			
+
 			return choice;
+		}
+	}
+
+	class WongJunYong_Harrison_Player extends Player {
+
+		// 0 0 0 - 6 points
+		// 0 0 1 - 3 points
+		// 0 1 0 - 3 points
+		// 0 1 1 - 0 points
+		// 1 0 0 - 8 points
+		// 1 0 1 - 5 points
+		// 1 1 0 - 5 points
+		// 1 1 1 - 2 points
+
+		private boolean angryMode = false;
+
+		int backstabPlayers(int n, int[] myHistory, int[] oppHistory1, int[] oppHistory2) {
+			// detect players if he try to cooperate.
+			if (n > 4) {
+				// get previous
+				if ((oppHistory1[oppHistory1.length - 1] == 0 && oppHistory1[oppHistory1.length - 2] == 0
+						&& oppHistory1[oppHistory1.length - 3] == 0 && oppHistory1[oppHistory1.length - 4] == 0)
+						&& (oppHistory2[oppHistory2.length - 1] == 0 && oppHistory2[oppHistory2.length - 2] == 0
+								&& oppHistory2[oppHistory2.length - 3] == 0
+								&& oppHistory2[oppHistory2.length - 4] == 0)) {
+					return 1;
+				}
+
+//				if ((oppHistory1[oppHistory1.length - 1] == 0 &&
+//						oppHistory2[oppHistory2.length - 1] == 1) || 
+//						(oppHistory1[oppHistory1.length - 1] == 1 && oppHistory2[oppHistory2.length - 1] == 0)) {
+//					return 1;
+//				}
+
+			}
+
+			// dont backstab players
+			return 0;
+		}
+
+		float[] calculateTotalPoints(int n, int[] myHistory, int[] oppHistory1, int[] oppHistory2) {
+			float ScoreA = 0, ScoreB = 0, ScoreC = 0;
+			float[] totalScore = new float[3];
+
+			for (int i = 0; i < n; i++) {
+				ScoreA = ScoreA + payoff[myHistory[i]][oppHistory1[i]][oppHistory2[i]];
+				ScoreB = ScoreB + payoff[oppHistory1[i]][oppHistory2[i]][myHistory[i]];
+				ScoreC = ScoreC + payoff[oppHistory2[i]][myHistory[i]][oppHistory1[i]];
+			}
+
+			totalScore[0] = ScoreA;
+			totalScore[1] = ScoreB;
+			totalScore[2] = ScoreC;
+			return totalScore;
+		}
+
+		int selectAction(int n, int[] myHistory, int[] oppHistory1, int[] oppHistory2) {
+			// first round
+			if (n == 0) {
+				return 1;
+			}
+
+			if (n > 1) {
+				// caluclate points
+				float[] totalScore = calculateTotalPoints(n, myHistory, oppHistory1, oppHistory2);
+				if (totalScore[2] > totalScore[0] || totalScore[1] > totalScore[0]) {
+					angryMode = true;
+				} else {
+					angryMode = false;
+				}
+			}
+
+			if (angryMode == true) {
+				return 1;
+			} else {
+				return backstabPlayers(n, myHistory, oppHistory1, oppHistory2);
+			}
+
 		}
 	}
 
@@ -221,7 +299,7 @@ public class ThreePrisonersDilemma {
 	 * entry to makePlayer, and change numPlayers.
 	 */
 
-	int numPlayers = 7;
+	int numPlayers = 8;
 
 	Player makePlayer(int which) {
 		switch (which) {
@@ -239,6 +317,8 @@ public class ThreePrisonersDilemma {
 			return new T4TPlayer();
 		case 6:
 			return new Huang_KyleJunyuan_Player();
+		case 7:
+			return new WongJunYong_Harrison_Player();
 		}
 		throw new RuntimeException("Bad argument passed to makePlayer");
 	}
@@ -246,27 +326,27 @@ public class ThreePrisonersDilemma {
 	/* Finally, the remaining code actually runs the tournament. */
 
 	public static void main(String[] args) {
-		int[] rankings = new int[7];
+		int[] ranks = new int[8];
 		int numTournaments = 200;
 
 		for (int i = 1; i <= numTournaments; i++) {
 			System.out.println("Tournament: " + i);
 			ThreePrisonersDilemma instance = new ThreePrisonersDilemma();
-			int rank = instance.runTournament();
+			int rank = instance.runTournament("Huang_KyleJunyuan_Player");
 			System.out.println();
 
 			/* Update rankings */
-			rankings[rank]++;
+			ranks[rank]++;
 		}
 
-		System.out.println("Player 6 1st: " + rankings[0] / (float) numTournaments * 100 + "%");
-		System.out.println("Player 6 2nd: " + rankings[1] / (float) numTournaments * 100 + "%");
-		System.out.println("Player 6 3rd: " + rankings[2] / (float) numTournaments * 100 + "%");
+		System.out.println("1st: " + ranks[0] / (float) numTournaments * 100 + "%");
+		System.out.println("2nd: " + ranks[1] / (float) numTournaments * 100 + "%");
+		System.out.println("3rd: " + ranks[2] / (float) numTournaments * 100 + "%");
 	}
 
 	boolean verbose = false; // set verbose = false if you get too much text output
 
-	int runTournament() {
+	int runTournament(String playerName) {
 		float[] totalScore = new float[numPlayers];
 
 		// This loop plays each triple of players against each other.
@@ -311,10 +391,10 @@ public class ThreePrisonersDilemma {
 		for (int i = 0; i < numPlayers; i++)
 			System.out.println(makePlayer(sortedOrder[i]).name() + ": " + totalScore[sortedOrder[i]] + " points.");
 
-		// Return rank of player 6
+		// Return rank of playerName
 		int rank = 0;
 		for (int i = 0; i < numPlayers; i++) {
-			if (sortedOrder[i] == 6) {
+			if (makePlayer(sortedOrder[i]).name().equals(playerName)) {
 				rank = i;
 				break;
 			}
