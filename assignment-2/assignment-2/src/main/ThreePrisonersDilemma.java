@@ -147,34 +147,37 @@ public class ThreePrisonersDilemma {
 
 		int selectAction(int n, int[] myHistory, int[] oppHistory1, int[] oppHistory2) {
 			if (n == 0)
-				return 0; // cooperate by default
+				return 0; // cooperate in the first round
 
-			/* 0. Count all scores */
-			int[] scores = new int[3];
-			for (int i = 0; i < n; i++) {
-				scores[0] += payoff[myHistory[i]][oppHistory1[i]][oppHistory2[i]];
-				scores[1] += payoff[oppHistory1[i]][oppHistory2[i]][myHistory[i]];
-				scores[2] += payoff[oppHistory2[i]][myHistory[i]][oppHistory1[i]];
-			}
+			/* 0. Previous move */
+			int prevOpp1Move = oppHistory1[n - 1];
+			int prevOpp2Move = oppHistory2[n - 1];
 
-			/* 1. Defect if score is lower */
-			if (scores[0] < scores[1] || scores[0] < scores[2])
-				return 1;
-
-			/* 2. Calculate percentage of cooperating */
+			/* 1. Calculate percentage of cooperating */
 			float perOpp1Coop = calCoopPercentage(oppHistory1);
 			float perOpp2Coop = calCoopPercentage(oppHistory2);
 
-			/* 3. Rule (based on popularity) */
-			// If both are mostly cooperating, cooperate
+			/* 2. Check if one player's choice is fixed */
+			if ((perOpp1Coop == 0 || perOpp1Coop == 100) && (perOpp2Coop > 0 && perOpp2Coop < 100)) {
+				// 2a. Don't get taken advantage
+				if (prevOpp1Move == 0 && prevOpp2Move == 0)
+					return 1;
+				else // 2b. Play tit-for-tat with Opp2
+					return prevOpp2Move;
+			} else if ((perOpp2Coop == 0 || perOpp2Coop == 100) && (perOpp1Coop > 0 && perOpp1Coop < 100)) {
+				// 2a. Don't get taken advantage
+				if (prevOpp1Move == 0 && prevOpp2Move == 0)
+					return 1;
+				else // 2b. Play tit-for-tat with Opp1
+					return prevOpp1Move;
+			}
+
+			/* 3. Popularity */
 			if (perOpp1Coop > 90 && perOpp2Coop > 90)
 				return 0;
-			// If both are mostly defecting, defect
-			else if (perOpp1Coop < 50 && perOpp2Coop < 50)
-				return 1;
-			// Else defect
-			else
-				return 1;
+
+			/* 4. Defect by default */
+			return 1;
 		}
 	}
 
