@@ -134,6 +134,7 @@ public class ThreePrisonersDilemma {
 	 *
 	 */
 	class Huang_KyleJunyuan_Player extends Player {
+		// Helper function to calculate percentage of cooperation
 		float calCoopPercentage(int[] history) {
 			int cooperates = 0;
 			int length = history.length;
@@ -157,6 +158,7 @@ public class ThreePrisonersDilemma {
 			if (perOpp1Coop > 90 && perOpp2Coop > 90) {
 				int range = (10 - 5) + 1; // Max: 10, Min: 5
 				int random = (int) (Math.random() * range) + 5;
+				
 				if (n > (90 + random))  // Selfish: Last min defect
 					return 1;
 				else
